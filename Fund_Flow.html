@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fund Flow Tracking - AgriSubsidy Portal</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: #ffffff;
+            color: #a0a0a0;
+            font-weight: 300;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #000000;
+            color: #b5b5b5;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            border-right: 1px solid #f0f0f0;
+        }
+
+        .logo {
+            padding: 24px 32px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .logo h2 {
+            font-size: 17px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        .logo i {
+            color: #d0d0d0;
+            font-size: 20px;
+        }
+
+        .nav-menu {
+            padding: 24px 0;
+        }
+
+        .nav-item {
+            margin: 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            background: #ffffff;
+        }
+
+        .nav-item.active a {
+            color: #000000;
+        }
+
+        .nav-item:hover {
+            background: #f5f5f5;
+        }
+
+        .nav-item:hover a {
+            color: #000000;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 12px 32px;
+            color: #b5b5b5;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 300;
+            gap: 12px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item i {
+            width: 18px;
+            font-size: 16px;
+            color: #d0d0d0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 80px 32px;
+            max-width: 1200px;
+        }
+
+        .header {
+            margin-bottom: 80px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 24px;
+            letter-spacing: -0.8px;
+            line-height: 1.15;
+        }
+
+        .header p {
+            color: #a0a0a0;
+            font-size: 17px;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        /* Fund Flow Pipeline */
+        .pipeline-section {
+            margin-bottom: 96px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 48px;
+            color: #000000;
+            letter-spacing: -0.8px;
+            line-height: 1.15;
+        }
+
+        .pipeline {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            padding: 32px;
+            background: #f5f5f5;
+            border-radius: 32px;
+            border: 1px solid #f0f0f0;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pipeline-step:hover {
+            background: #e8e8e8;
+        }
+
+        .pipeline-step.pending {
+            background: #f5f5f5;
+        }
+
+        .pipeline-step.processing {
+            background: #f5f5f5;
+        }
+
+        .step-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 32px;
+            font-size: 18px;
+            color: #ffffff;
+            stroke-width: 1.5px;
+        }
+
+        .step-icon.completed {
+            background: #000000;
+        }
+
+        .step-icon.pending {
+            background: #a0a0a0;
+        }
+
+        .step-icon.processing {
+            background: #d0d0d0;
+            color: #000000;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #000000;
+            letter-spacing: -0.3px;
+        }
+
+        .step-description {
+            font-size: 15px;
+            color: #a0a0a0;
+            margin-bottom: 12px;
+            font-weight: 300;
+        }
+
+        .step-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000000;
+            transition: color 0.3s ease;
+            letter-spacing: -0.5px;
+        }
+
+        .step-status {
+            font-size: 13px;
+            color: #a0a0a0;
+            font-weight: 300;
+            margin-top: 4px;
+        }
+
+        /* Recent Transactions */
+        .transactions-section {
+            margin-bottom: 96px;
+        }
+
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 0;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .transaction-item:hover {
+            background: #f5f5f5;
+            margin: 0 -32px;
+            padding: 24px 32px;
+            border-radius: 6px;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-info {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .transaction-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #000000;
+            font-size: 15px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .transaction-details h4 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #000000;
+        }
+
+        .transaction-details p {
+            font-size: 13px;
+            color: #a0a0a0;
+            font-weight: 300;
+            line-height: 1.4;
+        }
+
+        .transaction-amount {
+            text-align: right;
+        }
+
+        .amount {
+            font-size: 17px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
+        }
+
+        .transaction-status {
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+            background: #e8e8e8;
+            color: #000000;
+        }
+
+        .status-completed {
+            background: #000000;
+            color: #ffffff;
+        }
+
+        .status-pending {
+            background: #e8e8e8;
+            color: #a0a0a0;
+        }
+
+        .status-processing {
+            background: #d8d8d8;
+            color: #000000;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                padding: 48px 32px;
+            }
+
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .pipeline {
+                gap: 24px;
+            }
+
+            .pipeline-step {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 32px 16px;
+            }
+
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .pipeline-step {
+                flex-direction: column;
+                text-align: center;
+                padding: 24px;
+            }
+
+            .step-icon {
+                margin-right: 0;
+                margin-bottom: 16px;
+            }
+
+            .transaction-info {
+                gap: 16px;
+            }
+
+            .transaction-item:hover {
+                margin: 0 -16px;
+                padding: 24px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h2><i class="fas fa-seedling"></i> AgriSubsidy</h2>
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <a href="Subsidy_Engine.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="Subsidy_Engine.html">
+                        <i class="fas fa-cog"></i>
+                        Design Subsidy
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="Subsidy_Engine.html">
+                        <i class="fas fa-users"></i>
+                        Farmers & Land
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="Access.html">
+                        <i class="fas fa-file-alt"></i>
+                        Aadhaar Data
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="impact.html">
+                        <i class="fas fa-chart-line"></i>
+                        Impact Analytics
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="Subsidy_Engine.html">
+                        <i class="fas fa-cloud-sun"></i>
+                        Weather Data
+                    </a>
+                </div>
+                <div class="nav-item active">
+                    <a href="Fund_Flow.html">
+                        <i class="fas fa-exchange-alt"></i>
+                        Fund Flow
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="fraud_detection.html">
+                        <i class="fas fa-shield-alt"></i>
+                        Fraud Alerts
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1>Fund Flow Tracking</h1>
+                <p>Real-time visibility into subsidy disbursement and fund utilization monitoring</p>
+            </div>
+
+            <!-- Current Fund Flow Pipeline -->
+            <div class="pipeline-section">
+                <h2 class="section-title">Current Fund Flow Pipeline</h2>
+                <div class="pipeline">
+                    <div class="pipeline-step">
+                        <div class="step-icon completed">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="step-content">
+                            <div class="step-title">Central Allocation</div>
+                            <div class="step-description">COMPLETED</div>
+                            <div class="step-amount">₹450 Cr</div>
+                            <div class="step-status">Processing</div>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="step-icon completed">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="step-content">
+                            <div class="step-title">State Treasury</div>
+                            <div class="step-description">COMPLETED</div>
+                            <div class="step-amount">₹435 Cr</div>
+                            <div class="step-status">Processing</div>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step pending">
+                        <div class="step-icon pending">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="step-content">
+                            <div class="step-title">District Office</div>
+                            <div class="step-description">PENDING</div>
+                            <div class="step-amount">₹412 Cr</div>
+                            <div class="step-status">Pending</div>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step processing">
+                        <div class="step-icon processing">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                        <div class="step-content">
+                            <div class="step-title">Farmer Accounts</div>
+                            <div class="step-description">IN PROGRESS</div>
+                            <div class="step-amount">₹358 Cr</div>
+                            <div class="step-status">Processing</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="transactions-section">
+                <h2 class="section-title">Recent Transactions</h2>
+                <div id="transactionsList">
+                    <!-- Transactions will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample transaction data
+        const transactions = [
+            {
+                id: 'TXN001',
+                farmerName: 'Rajesh Kumar',
+                farmerId: 'FR-0001-0234',
+                scheme: 'PM-KISAN Direct Benefit',
+                amount: 6000,
+                date: '2024-10-14',
+                status: 'completed'
+            },
+            {
+                id: 'TXN002',
+                farmerName: 'Sunita Devi',
+                farmerId: 'FR-0002-0156',
+                scheme: 'Kho Precision Farming',
+                amount: 15000,
+                date: '2024-10-13',
+                status: 'processing'
+            },
+            {
+                id: 'TXN003',
+                farmerName: 'Mohan Lal',
+                farmerId: 'FR-0003-0289',
+                scheme: 'Crop Insurance Premium',
+                amount: 8500,
+                date: '2024-10-12',
+                status: 'pending'
+            },
+            {
+                id: 'TXN004',
+                farmerName: 'Priya Singh',
+                farmerId: 'FR-0004-0445',
+                scheme: 'Soil Health Management',
+                amount: 12000,
+                date: '2024-10-11',
+                status: 'completed'
+            },
+            {
+                id: 'TXN005',
+                farmerName: 'Vikram Patel',
+                farmerId: 'FR-0005-0667',
+                scheme: 'Drip Irrigation Subsidy',
+                amount: 25000,
+                date: '2024-10-10',
+                status: 'completed'
+            }
+        ];
+
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase();
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', { 
+                day: '2-digit', 
+                month: 'short', 
+                year: 'numeric' 
+            });
+        }
+
+        function getStatusClass(status) {
+            return `status-${status}`;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'completed': 'Completed',
+                'processing': 'Processing',
+                'pending': 'Pending'
+            };
+            return statusMap[status] || status;
+        }
+
+        function renderTransactions() {
+            const transactionsList = document.getElementById('transactionsList');
+            
+            transactionsList.innerHTML = transactions.map(transaction => `
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-avatar">
+                            ${getInitials(transaction.farmerName)}
+                        </div>
+                        <div class="transaction-details">
+                            <h4>${transaction.farmerName}</h4>
+                            <p>${transaction.farmerId} • ${transaction.scheme} • ${formatDate(transaction.date)}</p>
+                        </div>
+                    </div>
+                    <div class="transaction-amount">
+                        <div class="amount">₹${transaction.amount.toLocaleString('en-IN')}</div>
+                        <div class="transaction-status ${getStatusClass(transaction.status)}">
+                            ${getStatusText(transaction.status)}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Simulate real-time updates
+        function updatePipelineAmounts() {
+            const amounts = document.querySelectorAll('.step-amount');
+            amounts.forEach(amount => {
+                const currentAmount = parseInt(amount.textContent.replace(/[₹,\s]/g, ''));
+                const variation = Math.floor(Math.random() * 10) - 5; // ±5 variation
+                const newAmount = Math.max(0, currentAmount + variation);
+                
+                if (newAmount !== currentAmount) {
+                    amount.textContent = `₹${newAmount} Cr`;
+                    amount.style.color = variation > 0 ? '#4CAF50' : '#f44336';
+                    setTimeout(() => {
+                        amount.style.color = '#2E7D32';
+                    }, 1000);
+                }
+            });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTransactions();
+            
+            // Update amounts every 10 seconds
+            setInterval(updatePipelineAmounts, 10000);
+            
+            // Add some interactivity to pipeline steps
+            document.querySelectorAll('.pipeline-step').forEach(step => {
+                step.addEventListener('click', function() {
+                    const title = this.querySelector('.step-title').textContent;
+                    const amount = this.querySelector('.step-amount').textContent;
+                    const status = this.querySelector('.step-description').textContent;
+                    
+                    alert(`${title}\nAmount: ${amount}\nStatus: ${status}\n\nClick OK to view detailed breakdown.`);
+                });
+            });
+
+            // Add click handlers for transactions
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.transaction-item')) {
+                    const transactionItem = e.target.closest('.transaction-item');
+                    const farmerName = transactionItem.querySelector('h4').textContent;
+                    const details = transactionItem.querySelector('p').textContent;
+                    const amount = transactionItem.querySelector('.amount').textContent;
+                    
+                    alert(`Transaction Details:\n\nFarmer: ${farmerName}\nDetails: ${details}\nAmount: ${amount}\n\nClick OK to view full transaction history.`);
+                }
+            });
+        });
+
+        // Add some animations
+        function animateCounters() {
+            const amounts = document.querySelectorAll('.step-amount');
+            amounts.forEach(amount => {
+                const finalValue = parseInt(amount.textContent.replace(/[₹,\s]/g, ''));
+                let currentValue = 0;
+                const increment = finalValue / 50;
+                
+                const counter = setInterval(() => {
+                    currentValue += increment;
+                    if (currentValue >= finalValue) {
+                        currentValue = finalValue;
+                        clearInterval(counter);
+                    }
+                    amount.textContent = `₹${Math.floor(currentValue)} Cr`;
+                }, 20);
+            });
+        }
+
+        // Animate on load
+        window.addEventListener('load', () => {
+            setTimeout(animateCounters, 500);
+        });
+    </script>
+</body>
+</html>

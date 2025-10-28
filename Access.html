@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOA - Transforming India's Farm Subsidies</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            color: #000000;
+            background: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        .container-wide {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        .container-narrow {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+            z-index: 1000;
+        }
+
+        nav {
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #000000;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 64px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #b5b5b5;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 300;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #000000;
+        }
+
+        .cta-button {
+            background: #000000;
+            color: #ffffff;
+            padding: 14px 28px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            transition: background 0.3s ease;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            background: #333333;
+        }
+
+        .cta-button-secondary {
+            background: #e8e8e8;
+            color: #000000;
+        }
+
+        .cta-button-secondary:hover {
+            background: #d8d8d8;
+        }
+
+        /* Sidebar Navigation */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #000000;
+            color: #b5b5b5;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            border-right: 1px solid #f0f0f0;
+            z-index: 1001;
+        }
+
+        .sidebar .logo {
+            padding: 24px 32px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 17px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar .logo h2 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar .logo i {
+            color: #d0d0d0;
+            font-size: 20px;
+        }
+
+        .nav-menu {
+            padding: 24px 0;
+        }
+
+        .nav-item {
+            margin: 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            background: #ffffff;
+        }
+
+        .nav-item.active a {
+            color: #000000;
+        }
+
+        .nav-item:hover {
+            background: #f5f5f5;
+        }
+
+        .nav-item:hover a {
+            color: #000000;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 12px 32px;
+            color: #b5b5b5;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 300;
+            gap: 12px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item i {
+            width: 18px;
+            font-size: 16px;
+            color: #d0d0d0;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 200px 0 140px;
+            text-align: center;
+            margin-top: 73px;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.8px;
+            margin-bottom: 0;
+            color: #000000;
+        }
+
+        .hero .subtitle {
+            font-size: 56px;
+            font-weight: 300;
+            color: #c5c5c5;
+            line-height: 1.15;
+            letter-spacing: -0.8px;
+            margin-bottom: 48px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Vision Section */
+        .vision {
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .vision h2 {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: -0.8px;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            color: #000000;
+        }
+
+        .vision-text {
+            font-size: 17px;
+            font-weight: 300;
+            color: #a0a0a0;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Image Boxes */
+        .image-box {
+            background: #f5f5f5;
+            border-radius: 32px;
+            height: 450px;
+            margin: 80px 0;
+        }
+
+        /* Features Grid */
+        .features {
+            padding: 96px 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            margin-top: 64px;
+        }
+
+        .feature-item {
+            text-align: center;
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-icon svg {
+            width: 48px;
+            height: 48px;
+            stroke: #d0d0d0;
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .feature-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #000000;
+        }
+
+        /* Join Section */
+        .join {
+            padding: 128px 0;
+            text-align: center;
+        }
+
+        .join h2 {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            color: #000000;
+        }
+
+        .join-text {
+            font-size: 19px;
+            font-weight: 300;
+            color: #a0a0a0;
+            line-height: 1.7;
+            max-width: 900px;
+            margin: 0 auto 40px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 32px;
+            background: #ffffff;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #d0d0d0;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 80px;
+        }
+
+        .footer-column h3 {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #000000;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column li {
+            margin-bottom: 10px;
+        }
+
+        .footer-column a {
+            color: #b5b5b5;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 300;
+            transition: color 0.3s ease;
+        }
+
+        .footer-column a:hover {
+            color: #000000;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav {
+                padding: 24px 16px;
+            }
+
+            .nav-links {
+                gap: 32px;
+            }
+
+            .hero {
+                padding: 120px 0 80px;
+            }
+
+            .hero h1,
+            .hero .subtitle {
+                font-size: 36px;
+            }
+
+            .vision h2 {
+                font-size: 32px;
+            }
+
+            .join h2 {
+                font-size: 36px;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 32px;
+            }
+
+            .image-box {
+                height: 300px;
+                margin: 60px 0;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            .footer-links {
+                gap: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .cta-button {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h2><i class="fas fa-seedling"></i> AgriSubsidy</h2>
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <a href="Subsidy_Engine.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="Subsidy_Engine.html">
+                        <i class="fas fa-cog"></i>
+                        Design Subsidy
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="Subsidy_Engine.html">
+                        <i class="fas fa-users"></i>
+                        Farmers & Land
+                    </a>
+                </div>
+                <div class="nav-item active">
+                    <a href="Access.html">
+                        <i class="fas fa-file-alt"></i>
+                        Aadhaar Data
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="impact.html">
+                        <i class="fas fa-chart-line"></i>
+                        Impact Analytics
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="Subsidy_Engine.html">
+                        <i class="fas fa-cloud-sun"></i>
+                        Weather Data
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="Fund_Flow.html">
+                        <i class="fas fa-exchange-alt"></i>
+                        Fund Flow
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="fraud_detection.html">
+                        <i class="fas fa-shield-alt"></i>
+                        Fraud Alerts
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <section class="hero">
+                <div class="container-narrow">
+                    <h1>Transforming India's Farm Subsidies.</h1>
+                    <div class="subtitle">With AI, Blockchain & Data.</div>
+                    <div class="hero-buttons">
+                        <a href="#" class="cta-button">Get Early Access</a>
+                        <a href="#" class="cta-button cta-button-secondary">Learn More</a>
+                    </div>
+                </div>
+            </section>
+
+    <section class="vision" id="vision">
+        <div class="container">
+            <div class="image-box">
+                <img src="farmer.png" alt="Indian farmer working in the field" style="width: 100%; height: 100%; object-fit: cover; border-radius: 32px;">
+            </div>
+            <h2>Our Vision</h2>
+            <p class="vision-text">
+                To revolutionize India's agricultural subsidy ecosystem through AI, Blockchain, and Digital Public Infrastructure — ensuring every rupee reaches the right farmer, transparently, efficiently, and on time. We aim to empower policymakers with data-driven insights, enable farmers with easy digital access, and build a unified, trusted, and inclusive fintech platform for the future of Indian agriculture.
+            </p>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                            <path d="M9 12l2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <div class="feature-title">Transparency</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 2v4m0 12v4M4.22 4.22l2.83 2.83m9.9 9.9l2.83 2.83M2 12h4m12 0h4M4.22 19.78l2.83-2.83m9.9-9.9l2.83-2.83"/>
+                        </svg>
+                    </div>
+                    <div class="feature-title">AI-Powered Policy</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <div class="feature-title">Farmer Inclusion</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                    </div>
+                    <div class="feature-title">Real-Time Analytics</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="join">
+        <div class="container-narrow">
+            <h2>Join the Movement</h2>
+            <p class="join-text">
+                Empower farmers. Drive transparency. Shape the future of agri-finance.
+            </p>
+            <a href="#" class="cta-button">Get Early Access</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">BOA</div>
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h3>Platform</h3>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Technology</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Learn</h3>
+                    <ul>
+                        <li><a href="#">Vision</a></li>
+                        <li><a href="#">How It Works</a></li>
+                        <li><a href="#">Join</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

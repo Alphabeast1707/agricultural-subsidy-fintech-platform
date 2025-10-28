@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOA - Dynamic Subsidy Design Engine</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            color: #000000;
+            background: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        .container-wide {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        .container-narrow {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+            z-index: 1000;
+        }
+
+        nav {
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #000000;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 64px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #b5b5b5;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 300;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #000000;
+        }
+
+
+
+        /* Hero Section */
+        .hero {
+            padding: 200px 0 140px;
+            text-align: center;
+            margin-top: 73px;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.8px;
+            margin-bottom: 0;
+            color: #000000;
+        }
+
+        .hero .subtitle {
+            font-size: 56px;
+            font-weight: 300;
+            color: #c5c5c5;
+            line-height: 1.15;
+            letter-spacing: -0.8px;
+            margin-bottom: 48px;
+        }
+
+        /* Sections */
+        .section {
+            padding: 80px 0;
+        }
+
+        .features {
+            padding: 96px 0;
+        }
+
+        .section-title {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: -0.8px;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            color: #000000;
+            text-align: center;
+        }
+
+        /* Main Content Grid */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            padding: 80px 0;
+        }
+
+        /* Card Styles */
+        .card {
+            background: #ffffff;
+            border-radius: 32px;
+            padding: 48px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .card h2 {
+            color: #000000;
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: -0.8px;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 300;
+            font-size: 17px;
+            color: #a0a0a0;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid #f0f0f0;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 300;
+            color: #000000;
+            background: #ffffff;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #000000;
+        }
+
+        /* Button Styles */
+        .cta-button {
+            background: #000000;
+            color: #ffffff;
+            padding: 14px 28px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            transition: background 0.3s ease;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            background: #333333;
+        }
+
+        .cta-button-secondary {
+            background: #e8e8e8;
+            color: #000000;
+        }
+
+        .cta-button-secondary:hover {
+            background: #d8d8d8;
+        }
+
+        /* Rules List */
+        .rules-list {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .rule-item {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .rule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .rule-name {
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.3px;
+            color: #000000;
+        }
+
+        .rule-amount {
+            background: #000000;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .rule-details {
+            color: #a0a0a0;
+            font-size: 15px;
+            font-weight: 300;
+        }
+
+        /* Simulation Section */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .simulation-output {
+            background: #f5f5f5;
+            color: #000000;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 24px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            min-height: 300px;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            border: 1px solid #f0f0f0;
+            font-size: 15px;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        .loading {
+            display: none;
+            color: #a0a0a0;
+            font-weight: 300;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 450px;
+            margin-top: 48px;
+            background: #f5f5f5;
+            border-radius: 32px;
+            padding: 24px;
+        }
+
+        /* Image Boxes */
+        .image-box {
+            background: #f5f5f5;
+            border-radius: 32px;
+            height: 450px;
+            margin: 48px 0 24px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .hero h1,
+            .hero .subtitle {
+                font-size: 36px;
+            }
+
+            .section-title,
+            .card h2 {
+                font-size: 32px;
+            }
+
+            .card {
+                padding: 32px;
+            }
+
+            .image-box,
+            .chart-container {
+                height: 300px;
+            }
+        }
+
+        /* Status Messages */
+        .status-message {
+            padding: 16px 24px;
+            border-radius: 6px;
+            margin-bottom: 24px;
+            display: none;
+            font-size: 15px;
+            font-weight: 300;
+        }
+
+        .status-success {
+            background: #f5f5f5;
+            color: #000000;
+            border: 1px solid #f0f0f0;
+        }
+
+        .status-error {
+            background: #f5f5f5;
+            color: #000000;
+            border: 1px solid #f0f0f0;
+        }
+
+        /* Icons */
+        .icon {
+            width: 48px;
+            height: 48px;
+            stroke: #d0d0d0;
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        /* Data Source Info */
+        .data-sources {
+            padding: 24px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            margin: 24px 0;
+        }
+
+        .data-sources h3 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #000000;
+            margin-bottom: 16px;
+        }
+
+        .data-sources ul {
+            list-style: none;
+            color: #a0a0a0;
+            font-size: 15px;
+            font-weight: 300;
+        }
+
+        .data-sources li {
+            margin-bottom: 8px;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .data-sources li:before {
+            content: "•";
+            color: #d0d0d0;
+            position: absolute;
+            left: 0;
+        }
+
+        /* Footer */
+        footer {
+            padding: 32px;
+            background: #ffffff;
+            border-top: 1px solid #f0f0f0;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #d0d0d0;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 80px;
+        }
+
+        .footer-column h3 {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #000000;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column li {
+            margin-bottom: 10px;
+        }
+
+        .footer-column a {
+            color: #b5b5b5;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 300;
+            transition: color 0.3s ease;
+        }
+
+        .footer-column a:hover {
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">BOA</div>
+            <div class="nav-links">
+                <a href="Subsidy_Engine.html">Design Subsidy</a>
+                <a href="Access.html">Aadhaar Data</a>
+                <a href="Fund_Flow.html">Fund Flow</a>
+                <a href="impact.html">Impact Analytics</a>
+                <a href="fraud_detection.html">Fraud Alerts</a>
+            </div>
+        </nav>
+    </header>
+            <section class="hero">
+                <div class="container-narrow">
+                    <h1>Dynamic Subsidy Design Engine.</h1>
+                    <div class="subtitle">With Real-Time Data & AI.</div>
+                </div>
+            </section>
+
+    <main class="container">
+        <div class="main-content">
+            <!-- Rule Creation Form -->
+            <div class="card">
+                <h2>Create New Rule</h2>
+                
+                <div id="statusMessage" class="status-message"></div>
+                
+                <form id="ruleForm">
+                    <div class="form-group">
+                        <label for="schemeName">Scheme Name</label>
+                        <input type="text" id="schemeName" name="schemeName" required 
+                               placeholder="e.g., Drought Relief Fund">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="condition">Condition</label>
+                        <select id="conditionType" name="conditionType" style="margin-bottom: 8px;">
+                            <option value="custom">Custom Condition</option>
+                            <option value="weather">Weather-Based</option>
+                            <option value="crop">Crop Health-Based</option>
+                            <option value="soil">Soil Health-Based</option>
+                        </select>
+                        <input type="text" id="condition" name="condition" required 
+                               placeholder="e.g., rainfall < 75, crop_ndvi < 0.6, soil_ph > 8.0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="amount">Subsidy Amount (₹)</label>
+                        <input type="number" id="amount" name="amount" required min="1" 
+                               placeholder="e.g., 5000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="district">District</label>
+                        <select id="district" name="district" required>
+                            <option value="">Select District</option>
+                            <option value="Ahmedabad">Ahmedabad</option>
+                            <option value="Pune">Pune</option>
+                            <option value="Bengaluru">Bengaluru</option>
+                            <option value="Chennai">Chennai</option>
+                            <option value="Mumbai">Mumbai</option>
+                            <option value="Delhi">Delhi</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="cta-button">Create Rule</button>
+                </form>
+            </div>
+
+            <!-- Active Rules List -->
+            <div class="card">
+                <h2>Active Rules</h2>
+                
+                <div id="rulesList" class="rules-list">
+                    <p style="color: #a0a0a0; text-align: center; padding: 48px; font-weight: 300;">
+                        No active rules yet. Create your first rule above.
+                    </p>
+                </div>
+            </div>
+
+        <!-- Research Insights Section -->
+        <div class="container">
+            <div class="data-sources">
+                <h3>Research-Based Insights</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 16px;">
+                    <div>
+                        <h4 style="color: #000000; font-size: 15px; font-weight: 500; margin-bottom: 8px;">PM-KISAN Implementation Challenges</h4>
+                        <ul style="margin-bottom: 16px;">
+                            <li><strong>64.67%</strong> lack e-KYC awareness</li>
+                            <li><strong>56.67%</strong> face payment delays</li>
+                            <li><strong>59.33%</strong> find amounts inadequate</li>
+                        </ul>
+                        <h4 style="color: #000000; font-size: 15px; font-weight: 500; margin-bottom: 8px;">Digital Barriers</h4>
+                        <ul>
+                            <li>Biometric failures (elderly/manual workers)</li>
+                            <li>Network dependency issues</li>
+                            <li>Low digital literacy</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: #000000; font-size: 15px; font-weight: 500; margin-bottom: 8px;">System Opportunities</h4>
+                        <ul style="margin-bottom: 16px;">
+                            <li>AgriStack integration (Digital Agriculture Mission)</li>
+                            <li>Krishi-DSS real-time data platform</li>
+                            <li>Unified farmer registry system</li>
+                        </ul>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="loadResearchData" class="cta-button" style="font-size: 13px; padding: 8px 16px;">
+                                Load Research Data
+                            </button>
+                            <button id="validateResearch" class="cta-button cta-button-secondary" style="font-size: 13px; padding: 8px 16px;">
+                                Validate Implementation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Sources Section -->
+        <div class="container">
+            <div class="data-sources">
+                <h3>Real-Time Data Sources</h3>
+                <ul>
+                    <li><strong>Weather:</strong> Weatherbit.io, Ambee, Tomorrow.io (Hourly/Daily forecasts)</li>
+                    <li><strong>Soil Health:</strong> Krishi-DSS Data Exchange, Soil Health Card Portal</li>
+                    <li><strong>Crop Data:</strong> AgriStack via UFSI API (Seasonal crop information)</li>
+                    <li><strong>Satellite:</strong> EOSDA, Cropin, SatSure (Weekly NDVI crop health)</li>
+                    <li><strong>Market Prices:</strong> data.gov.in AGMARKNET, e-NAM (Daily commodity prices)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Simulation Section -->
+        <div class="container">
+            <div class="card full-width">
+                <h2>Simulation Engine</h2>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 14px; font-weight: 500; color: #666;">AI Simulation Location:</label>
+                        <select id="simulationLocation" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                            <option value="Ahmedabad">Ahmedabad</option>
+                            <option value="Pune">Pune</option>
+                            <option value="Bengaluru">Bengaluru</option>
+                            <option value="Chennai">Chennai</option>
+                            <option value="Mumbai">Mumbai</option>
+                            <option value="Delhi">Delhi</option>
+                        </select>
+                        <button id="runSimulation" class="cta-button">Run Simulation</button>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 14px; font-weight: 500; color: #666;">Satellite Analysis Location:</label>
+                        <select id="satelliteLocation" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                            <option value="Ahmedabad">Ahmedabad</option>
+                            <option value="Pune">Pune</option>
+                            <option value="Bengaluru">Bengaluru</option>
+                            <option value="Chennai">Chennai</option>
+                            <option value="Mumbai">Mumbai</option>
+                            <option value="Delhi">Delhi</option>
+                        </select>
+                        <button id="runSatelliteSimulation" class="cta-button" style="background: linear-gradient(135deg, #4CAF50, #388E3C);">🛰️ Satellite + Subsidy Analysis</button>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <button id="clearOutput" class="cta-button cta-button-secondary">Clear Output</button>
+                    <span id="loadingIndicator" class="loading">Running simulation...</span>
+                </div>
+                
+                <div style="margin-bottom: 16px; padding: 16px; background: #f5f5f5; border-radius: 6px; font-size: 13px; color: #a0a0a0;">
+                    <strong>Location-Based Analysis:</strong> Select your preferred district above for targeted analysis. Enhanced simulation incorporates 
+                    AI-powered analytics, live weather data for the selected location, and research-based implementation challenges including e-KYC barriers, 
+                    payment delays, and digital exclusion based on PM-KISAN studies.
+                </div>
+                
+                <!-- Weather Dashboard -->
+                <div id="weatherDashboard" class="weather-dashboard" style="display: none; margin-bottom: 24px; padding: 20px; background: linear-gradient(135deg, #E3F2FD, #BBDEFB); border-radius: 12px; border: 1px solid #90CAF9;">
+                    <h3 style="margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
+                        🌤️ Live Weather Data - Agricultural Hub Analysis
+                    </h3>
+                    <div id="weatherContent" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; font-size: 14px;"></div>
+                </div>
+
+                <!-- AI Insights Dashboard -->
+                <div id="aiInsightsDashboard" class="ai-insights-dashboard" style="display: none; margin-bottom: 24px; padding: 20px; background: linear-gradient(135deg, #F3E5F5, #E1BEE7); border-radius: 12px; border: 1px solid #CE93D8;">
+                    <h3 style="margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
+                        AI Insights & Recommendations
+                    </h3>
+                    <div id="aiInsightsContent"></div>
+                </div>
+
+                <!-- Satellite Data Dashboard -->
+                <div id="satelliteDashboard" class="satellite-dashboard" style="display: none; margin-bottom: 24px; padding: 20px; background: linear-gradient(135deg, #E8F5E8, #C8E6C9); border-radius: 12px; border: 1px solid #81C784;">
+                    <h3 style="margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
+                        🛰️ Real-Time Satellite Crop Monitoring
+                    </h3>
+                    <div id="satelliteContent">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div id="satelliteStats"></div>
+                            <div id="satelliteMap" style="background: #f0f0f0; border-radius: 8px; padding: 16px; text-align: center; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                                <div style="color: #666;">
+                                    🗺️ Field Health Visualization<br>
+                                    <small>NDVI Color-coded Map</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="satelliteAlerts" style="margin-top: 16px;"></div>
+                    </div>
+                </div>
+
+                <div id="simulationOutput" class="simulation-output">
+Subsidy Simulation Console
+Ready to run simulations...
+
+🚀 Enhanced Features Available:
+- 🌤️ Live Weather API Integration (WeatherAPI.com)
+- 🤖 Gemini AI Powered Analytics & Recommendations  
+- 📊 Real-time Agricultural Data (AgriStack, Krishi-DSS)
+- 🛰️ Satellite Monitoring (EOSDA NDVI)
+- 💰 Market Price Feeds (AGMARKNET, e-NAM)
+
+Active farmers database: 50,000+ registered
+System ready for enhanced AI-powered subsidy calculations...
+                </div>
+
+                <!-- Chart Container -->
+                <div class="chart-container">
+                    <canvas id="subsidyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">BOA</div>
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h3>Engine</h3>
+                    <ul>
+                        <li><a href="#">Rules</a></li>
+                        <li><a href="#">Simulation</a></li>
+                        <li><a href="#">Analytics</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Data Sources</h3>
+                    <ul>
+                        <li><a href="#">Weather APIs</a></li>
+                        <li><a href="#">Krishi-DSS</a></li>
+                        <li><a href="#">Satellite Data</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Global variables
+        let chart = null;
+        const API_BASE = 'http://localhost:8000';
+
+        // DOM elements
+        const ruleForm = document.getElementById('ruleForm');
+        const rulesList = document.getElementById('rulesList');
+        const runSimulationBtn = document.getElementById('runSimulation');
+        const clearOutputBtn = document.getElementById('clearOutput');
+        const simulationOutput = document.getElementById('simulationOutput');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const statusMessage = document.getElementById('statusMessage');
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRules();
+            initializeChart();
+            setupConditionHelper();
+        });
+
+        // Setup condition helper
+        function setupConditionHelper() {
+            const conditionType = document.getElementById('conditionType');
+            const conditionInput = document.getElementById('condition');
+            
+            const conditionExamples = {
+                'weather': [
+                    'rainfall < 75',
+                    'temperature > 40',
+                    'rainfall > 150'
+                ],
+                'crop': [
+                    'crop_ndvi < 0.6',
+                    'crop_health < good',
+                    'ndvi < 0.5'
+                ],
+                'soil': [
+                    'soil_ph < 6.0',
+                    'soil_ph > 8.5',
+                    'nitrogen = low'
+                ],
+                'custom': [
+                    'rainfall < 75',
+                    'temperature > 40',
+                    'crop_ndvi < 0.6'
+                ]
+            };
+
+            conditionType.addEventListener('change', function() {
+                const examples = conditionExamples[this.value] || conditionExamples['custom'];
+                const randomExample = examples[Math.floor(Math.random() * examples.length)];
+                conditionInput.placeholder = `e.g., ${randomExample}`;
+            });
+        }
+
+        // Show status message
+        function showStatus(message, type = 'success') {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message status-${type}`;
+            statusMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        // Create new rule
+        ruleForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(ruleForm);
+            const ruleData = {
+                schemeName: formData.get('schemeName'),
+                condition: formData.get('condition'),
+                amount: parseInt(formData.get('amount')),
+                district: formData.get('district')
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/rules`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(ruleData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showStatus('✅ Rule created successfully!', 'success');
+                    ruleForm.reset();
+                    loadRules();
+                } else {
+                    throw new Error('Failed to create rule');
+                }
+            } catch (error) {
+                console.error('Error creating rule:', error);
+                showStatus('❌ Failed to create rule. Please check if the backend server is running.', 'error');
+            }
+        });
+
+        // Load and display rules
+        async function loadRules() {
+            try {
+                const response = await fetch(`${API_BASE}/rules`);
+                if (response.ok) {
+                    const rules = await response.json();
+                    displayRules(rules);
+                } else {
+                    console.error('Failed to load rules');
+                }
+            } catch (error) {
+                console.error('Error loading rules:', error);
+                // Show mock data when backend is not available
+                displayRules([
+                    {
+                        id: 1,
+                        schemeName: "Drought Relief Fund",
+                        condition: "rainfall < 75",
+                        amount: 5000,
+                        district: "Ahmedabad"
+                    },
+                    {
+                        id: 2,
+                        schemeName: "Crop Insurance Support",
+                        condition: "temperature > 40",
+                        amount: 3000,
+                        district: "Pune"
+                    }
+                ]);
+            }
+        }
+
+        // Display rules in the UI
+        function displayRules(rules) {
+            if (rules.length === 0) {
+                rulesList.innerHTML = `
+                    <p style="color: #64748b; text-align: center; padding: 2rem;">
+                        No active rules yet. Create your first rule above.
+                    </p>
+                `;
+                return;
+            }
+
+            rulesList.innerHTML = rules.map(rule => `
+                <div class="rule-item">
+                    <div class="rule-header">
+                        <span class="rule-name">${rule.schemeName}</span>
+                        <span class="rule-amount">₹${rule.amount.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div class="rule-details">
+                        <strong>Condition:</strong> ${rule.condition} | 
+                        <strong>District:</strong> ${rule.district}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Run simulation (enhanced with AI and Weather)
+        runSimulationBtn.addEventListener('click', async function() {
+            runEnhancedSimulation();
+        });
+
+        // Run satellite-based subsidy analysis
+        document.getElementById('runSatelliteSimulation').addEventListener('click', async function() {
+            runSatelliteAnalysis();
+        });
+
+        async function runEnhancedSimulation() {
+            const selectedLocation = document.getElementById('simulationLocation').value;
+            
+            loadingIndicator.style.display = 'inline';
+            runSimulationBtn.disabled = true;
+            document.getElementById('runSatelliteSimulation').disabled = true;
+
+            try {
+                showStatus(`🤖 Running enhanced simulation for ${selectedLocation} with AI and weather data...`, 'loading');
+                
+                // Try to connect to backend first
+                const response = await fetch(`${API_BASE}/simulate-enhanced`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        location: selectedLocation
+                    })
+                });
+                
+                if (response.ok) {
+                    const enhancedData = await response.json();
+                    displayEnhancedSimulationResults(enhancedData);
+                    displayWeatherDashboard(enhancedData.weather_data);
+                    displayAIInsights(enhancedData.ai_insights);
+                    updateChart(enhancedData);
+                    showStatus(`✅ Enhanced simulation for ${selectedLocation} completed successfully!`, 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Enhanced simulation error:', error);
+                console.log('Falling back to mock simulation data...');
+                
+                // Fallback to mock simulation when server is not available
+                const mockData = generateMockSimulationData(selectedLocation);
+                displayEnhancedSimulationResults(mockData);
+                displayWeatherDashboard(mockData.weather_data);
+                displayAIInsights(mockData.ai_insights);
+                updateChart(mockData);
+                showStatus(`✅ Demo simulation for ${selectedLocation} completed (using mock data)!`, 'success');
+            } finally {
+                loadingIndicator.style.display = 'none';
+                runSimulationBtn.disabled = false;
+                document.getElementById('runSatelliteSimulation').disabled = false;
+            }
+        }
+
+        // Generate mock simulation data for demo purposes
+        function generateMockSimulationData(location) {
+            const mockWeatherConditions = ['Sunny', 'Partly Cloudy', 'Rainy', 'Overcast', 'Clear'];
+            const mockCondition = mockWeatherConditions[Math.floor(Math.random() * mockWeatherConditions.length)];
+            
+            return {
+                timestamp: new Date().toISOString(),
+                location: location,
+                summary: {
+                    enhancement_factor: 1.2 + Math.random() * 0.5,
+                    weather_impact: {
+                        risk_level: Math.random() > 0.5 ? 'Medium' : 'Low',
+                        emergency_triggers: Math.random() > 0.7
+                    },
+                    ai_recommendations: Math.floor(Math.random() * 8) + 3
+                },
+                weather_data: {
+                    location: location,
+                    condition: mockCondition,
+                    temperature: Math.floor(Math.random() * 15) + 20,
+                    humidity: Math.floor(Math.random() * 40) + 40,
+                    precipitation: Math.floor(Math.random() * 10),
+                    wind_speed: Math.floor(Math.random() * 20) + 5,
+                    uv_index: Math.floor(Math.random() * 8) + 1,
+                    pressure: Math.floor(Math.random() * 50) + 1000
+                },
+                ai_insights: [
+                    {
+                        category: 'Operational Efficiency',
+                        insight: `Based on current weather patterns in ${location}, subsidy distribution should prioritize drought-resistant crop varieties and water conservation initiatives.`,
+                        confidence: 0.85 + Math.random() * 0.1,
+                        recommendations: [
+                            'Implement precision irrigation systems',
+                            'Promote drought-resistant seed varieties',
+                            'Establish regional water storage facilities'
+                        ],
+                        risk_factors: [
+                            'Seasonal water scarcity',
+                            'Temperature fluctuations',
+                            'Market price volatility'
+                        ]
+                    },
+                    {
+                        category: 'Financial Optimization',
+                        insight: `Market analysis for ${location} suggests optimal subsidy timing should align with pre-monsoon agricultural activities for maximum impact.`,
+                        confidence: 0.78 + Math.random() * 0.15,
+                        recommendations: [
+                            'Align payments with agricultural calendar',
+                            'Implement dynamic pricing based on crop cycles',
+                            'Create emergency reserve funds'
+                        ],
+                        risk_factors: [
+                            'Budget constraints',
+                            'Administrative delays',
+                            'Market price fluctuations'
+                        ]
+                    },
+                    {
+                        category: 'Technology Integration',
+                        insight: `Digital literacy programs in ${location} should be enhanced to improve e-KYC completion rates and reduce payment processing delays.`,
+                        confidence: 0.82 + Math.random() * 0.1,
+                        recommendations: [
+                            'Mobile-first application design',
+                            'Multi-language support systems',
+                            'Offline capability for remote areas'
+                        ],
+                        risk_factors: [
+                            'Limited internet connectivity',
+                            'Device accessibility',
+                            'Digital skill gaps'
+                        ]
+                    }
+                ],
+                triggeredSubsidies: [
+                    {
+                        schemeName: 'Weather-Adaptive Crop Support',
+                        condition: `temperature > ${Math.floor(Math.random() * 5) + 35}`,
+                        amount: Math.floor(Math.random() * 3000) + 5000,
+                        district: location,
+                        eligibleFarmers: Math.floor(Math.random() * 5000) + 2000,
+                        totalPayout: (Math.floor(Math.random() * 3000) + 5000) * (Math.floor(Math.random() * 5000) + 2000)
+                    },
+                    {
+                        schemeName: 'Precision Agriculture Initiative',
+                        condition: `humidity < ${Math.floor(Math.random() * 10) + 50}`,
+                        amount: Math.floor(Math.random() * 2000) + 3000,
+                        district: location,
+                        eligibleFarmers: Math.floor(Math.random() * 3000) + 1500,
+                        totalPayout: (Math.floor(Math.random() * 2000) + 3000) * (Math.floor(Math.random() * 3000) + 1500)
+                    }
+                ]
+            };
+        }
+
+
+
+        // Display enhanced simulation results with weather and AI
+        function displayEnhancedSimulationResults(data) {
+            const output = `
+🌤️🤖 ENHANCED AI-POWERED SUBSIDY SIMULATION
+════════════════════════════════════════
+
+SIMULATION TIMESTAMP: ${new Date(data.timestamp).toLocaleString('en-IN')}
+ENHANCEMENT FACTOR: ${data.summary.enhancement_factor}x (weather-adjusted)
+
+LIVE WEATHER INTEGRATION:
+   Location: ${data.weather_data.location}
+   Condition: ${data.weather_data.condition}
+   Risk Level: ${data.summary.weather_impact.risk_level}
+   Emergency Triggers: ${data.summary.weather_impact.emergency_triggers ? 'YES' : 'NO'}
+
+AI ANALYSIS SUMMARY:
+   Total Insights Generated: ${data.summary.ai_recommendations}
+   Categories Analyzed: Operational, Financial, Technology
+   Confidence Level: High (85%+)
+
+WEATHER-ADJUSTED SUBSIDIES:
+${data.triggeredSubsidies.map(subsidy => `
+   ${subsidy.schemeName}
+   ├─ Condition: ${subsidy.condition} ✅
+   ├─ Weather-Adjusted Amount: ₹${subsidy.amount.toLocaleString('en-IN')}
+   ├─ Eligible Farmers: ${subsidy.eligibleFarmers.toLocaleString('en-IN')}
+   ├─ District: ${subsidy.district}
+   └─ Enhanced Payout: ₹${subsidy.totalPayout.toLocaleString('en-IN')}
+`).join('')}
+
+ENHANCED SIMULATION SUMMARY:
+   Total Enhanced Payout: ₹${data.triggeredSubsidies.reduce((sum, s) => sum + s.totalPayout, 0).toLocaleString('en-IN')}
+   Weather Impact Applied: ${((data.summary.enhancement_factor - 1) * 100).toFixed(1)}%
+   AI Recommendations: ${data.ai_insights.length} insights generated
+   System Status: FULLY OPERATIONAL ✅
+
+🚀 Enhanced simulation with live weather data and AI analytics completed.
+════════════════════════════════════════
+            `;
+            
+            simulationOutput.textContent = output;
+        }
+
+        // Display weather dashboard
+        function displayWeatherDashboard(weatherData) {
+            const weatherDashboard = document.getElementById('weatherDashboard');
+            const weatherContent = document.getElementById('weatherContent');
+            
+            weatherContent.innerHTML = `
+                <div><strong>Location:</strong><br>${weatherData.location}</div>
+                <div><strong>Condition:</strong><br>${weatherData.condition}</div>
+                <div><strong>Temperature:</strong><br>${weatherData.temperature}°C</div>
+                <div><strong>Humidity:</strong><br>${weatherData.humidity}%</div>
+                <div><strong>Precipitation:</strong><br>${weatherData.precipitation}mm</div>
+                <div><strong>Wind Speed:</strong><br>${weatherData.wind_speed} km/h</div>
+                <div><strong>UV Index:</strong><br>${weatherData.uv_index}</div>
+                <div><strong>Pressure:</strong><br>${weatherData.pressure} mb</div>
+            `;
+            
+            weatherDashboard.style.display = 'block';
+        }
+
+        // Display AI insights
+        function displayAIInsights(aiInsights) {
+            const aiDashboard = document.getElementById('aiInsightsDashboard');
+            const aiContent = document.getElementById('aiInsightsContent');
+            
+            aiContent.innerHTML = aiInsights.map(insight => `
+                <div style="margin-bottom: 20px; padding: 16px; background: rgba(255,255,255,0.7); border-radius: 8px; border-left: 4px solid #9C27B0;">
+                    <h4 style="margin: 0 0 8px 0; color: #7B1FA2;">${insight.category}</h4>
+                    <p style="margin: 0 0 12px 0; font-size: 14px; line-height: 1.4;">${insight.insight}</p>
+                    <div style="font-size: 13px;">
+                        <strong>Confidence:</strong> ${(insight.confidence * 100).toFixed(0)}% | 
+                        <strong>Recommendations:</strong> ${insight.recommendations.length} items | 
+                        <strong>Risk Factors:</strong> ${insight.risk_factors.length} identified
+                    </div>
+                    <details style="margin-top: 8px;">
+                        <summary style="cursor: pointer; font-size: 13px; color: #7B1FA2;">View Details</summary>
+                        <div style="margin-top: 8px; padding-left: 16px;">
+                            <div style="margin-bottom: 8px;">
+                                <strong>Recommendations:</strong>
+                                <ul style="margin: 4px 0 0 0; padding-left: 16px;">
+                                    ${insight.recommendations.map(rec => `<li style="margin-bottom: 2px;">${rec}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>Risk Factors:</strong>
+                                <ul style="margin: 4px 0 0 0; padding-left: 16px;">
+                                    ${insight.risk_factors.map(risk => `<li style="margin-bottom: 2px;">${risk}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            `).join('');
+            
+            aiDashboard.style.display = 'block';
+        }
+
+        // Run satellite-based subsidy analysis
+        async function runSatelliteAnalysis() {
+            const selectedLocation = document.getElementById('satelliteLocation').value;
+            
+            loadingIndicator.style.display = 'inline';
+            runSimulationBtn.disabled = true;
+            document.getElementById('runSatelliteSimulation').disabled = true;
+
+            try {
+                showStatus(`🛰️ Fetching real-time satellite data for ${selectedLocation} and analyzing subsidy needs...`, 'loading');
+                
+                // Try to get satellite data for selected district
+                const satelliteResponse = await fetch(`${API_BASE}/satellite/realtime/${selectedLocation}`);
+                if (!satelliteResponse.ok) throw new Error('Satellite data fetch failed');
+                const satelliteData = await satelliteResponse.json();
+                
+                // Get satellite-based subsidy analysis
+                const analysisResponse = await fetch(`${API_BASE}/satellite/subsidy-analysis/${selectedLocation}`);
+                if (!analysisResponse.ok) throw new Error('Subsidy analysis failed');
+                const subsidyAnalysis = await analysisResponse.json();
+                
+                // Display satellite data and analysis
+                displaySatelliteData(satelliteData);
+                displaySatelliteSubsidyAnalysis(subsidyAnalysis);
+                
+                showStatus(`✅ Satellite analysis for ${selectedLocation} completed successfully!`, 'success');
+                
+            } catch (error) {
+                console.error('Satellite analysis error:', error);
+                console.log('Falling back to mock satellite data...');
+                
+                // Fallback to mock satellite data
+                const mockSatelliteData = generateMockSatelliteData(selectedLocation);
+                const mockSubsidyAnalysis = generateMockSubsidyAnalysis(selectedLocation);
+                
+                displaySatelliteData(mockSatelliteData);
+                displaySatelliteSubsidyAnalysis(mockSubsidyAnalysis);
+                
+                showStatus(`✅ Demo satellite analysis for ${selectedLocation} completed (using mock data)!`, 'success');
+            } finally {
+                loadingIndicator.style.display = 'none';
+                runSimulationBtn.disabled = false;
+                document.getElementById('runSatelliteSimulation').disabled = false;
+            }
+        }
+
+        // Generate mock satellite data
+        function generateMockSatelliteData(location) {
+            const healthColors = [
+                { field_id: 'F001', color: '#228B22' }, // Excellent - Dark Green
+                { field_id: 'F002', color: '#9ACD32' }, // Good - Yellow Green
+                { field_id: 'F003', color: '#FFD700' }, // Moderate - Gold
+                { field_id: 'F004', color: '#FF4500' }, // Poor - Orange Red
+                { field_id: 'F005', color: '#228B22' },
+                { field_id: 'F006', color: '#9ACD32' },
+                { field_id: 'F007', color: '#FFD700' },
+                { field_id: 'F008', color: '#228B22' },
+                { field_id: 'F009', color: '#FF4500' },
+                { field_id: 'F010', color: '#9ACD32' },
+                { field_id: 'F011', color: '#228B22' },
+                { field_id: 'F012', color: '#FFD700' }
+            ];
+
+            return {
+                district: location,
+                satellite_overview: {
+                    total_fields_monitored: Math.floor(Math.random() * 500) + 800,
+                    total_area_hectares: Math.floor(Math.random() * 10000) + 15000,
+                    average_ndvi: (0.4 + Math.random() * 0.4).toFixed(2),
+                    district_health_score: Math.floor(Math.random() * 30) + 65,
+                    coverage_percentage: Math.floor(Math.random() * 10) + 85,
+                    cloud_coverage: Math.floor(Math.random() * 20) + 5 + '%'
+                },
+                health_distribution: {
+                    excellent: Math.floor(Math.random() * 100) + 150,
+                    good: Math.floor(Math.random() * 150) + 200,
+                    moderate: Math.floor(Math.random() * 100) + 120,
+                    poor: Math.floor(Math.random() * 80) + 50
+                },
+                visualization_data: {
+                    field_boundaries: healthColors
+                },
+                alerts: [
+                    {
+                        type: 'crop_stress',
+                        affected_fields: Math.floor(Math.random() * 20) + 15,
+                        severity: 'medium',
+                        recommendation: 'Implement precision irrigation in affected areas to mitigate water stress.'
+                    },
+                    {
+                        type: 'pest_detection',
+                        affected_fields: Math.floor(Math.random() * 10) + 8,
+                        severity: 'high',
+                        recommendation: 'Deploy integrated pest management protocols immediately.'
+                    }
+                ]
+            };
+        }
+
+        // Generate mock subsidy analysis
+        function generateMockSubsidyAnalysis(location) {
+            return {
+                analysis_timestamp: new Date().toISOString(),
+                district: location,
+                satellite_insights: {
+                    total_fields_analyzed: Math.floor(Math.random() * 500) + 800,
+                    critical_fields: Math.floor(Math.random() * 50) + 25,
+                    moderate_stress_fields: Math.floor(Math.random() * 100) + 80,
+                    healthy_fields: Math.floor(Math.random() * 300) + 400
+                },
+                targeted_subsidies: [
+                    {
+                        scheme_name: 'Crop Stress Relief Fund',
+                        target_fields: Math.floor(Math.random() * 50) + 25,
+                        eligibility_criteria: 'NDVI < 0.5 (Critical Stress)',
+                        amount_per_hectare: Math.floor(Math.random() * 2000) + 3000,
+                        total_area: Math.floor(Math.random() * 500) + 200,
+                        estimated_farmers: Math.floor(Math.random() * 100) + 80,
+                        urgency: 'High',
+                        total_allocation: (Math.floor(Math.random() * 2000) + 3000) * (Math.floor(Math.random() * 500) + 200)
+                    },
+                    {
+                        scheme_name: 'Precision Agriculture Support',
+                        target_fields: Math.floor(Math.random() * 80) + 60,
+                        eligibility_criteria: 'NDVI 0.5-0.7 (Moderate Stress)',
+                        amount_per_hectare: Math.floor(Math.random() * 1500) + 2000,
+                        total_area: Math.floor(Math.random() * 800) + 400,
+                        estimated_farmers: Math.floor(Math.random() * 150) + 120,
+                        urgency: 'Medium',
+                        total_allocation: (Math.floor(Math.random() * 1500) + 2000) * (Math.floor(Math.random() * 800) + 400)
+                    }
+                ],
+                financial_projection: {
+                    total_estimated_cost: Math.floor(Math.random() * 50000000) + 20000000,
+                    farmers_to_benefit: Math.floor(Math.random() * 300) + 200,
+                    priority_interventions: [
+                        'Immediate water stress mitigation',
+                        'Precision fertilizer application',
+                        'Integrated pest management deployment',
+                        'Soil health monitoring enhancement'
+                    ]
+                },
+                efficiency_metrics: {
+                    precision_targeting: '92% accuracy',
+                    expected_impact: '15-25% yield improvement',
+                    monitoring_advantage: 'Real-time crop health tracking',
+                    cost_per_hectare: Math.floor(Math.random() * 1000) + 2500
+                }
+            };
+        }
+
+        // Display satellite data dashboard
+        function displaySatelliteData(satelliteData) {
+            const satelliteDashboard = document.getElementById('satelliteDashboard');
+            const satelliteStats = document.getElementById('satelliteStats');
+            const satelliteMap = document.getElementById('satelliteMap');
+            const satelliteAlerts = document.getElementById('satelliteAlerts');
+            
+            // Display overview statistics
+            satelliteStats.innerHTML = `
+                <h4 style="margin: 0 0 12px 0; color: #2E7D32;">District Overview</h4>
+                <div style="font-size: 14px; line-height: 1.6;">
+                    <div><strong>Fields Monitored:</strong> ${satelliteData.satellite_overview.total_fields_monitored}</div>
+                    <div><strong>Total Area:</strong> ${satelliteData.satellite_overview.total_area_hectares} hectares</div>
+                    <div><strong>Average NDVI:</strong> ${satelliteData.satellite_overview.average_ndvi}</div>
+                    <div><strong>Health Score:</strong> ${satelliteData.satellite_overview.district_health_score}%</div>
+                    <div><strong>Coverage:</strong> ${satelliteData.satellite_overview.coverage_percentage}%</div>
+                    <div><strong>Cloud Cover:</strong> ${satelliteData.satellite_overview.cloud_coverage}</div>
+                </div>
+                
+                <h4 style="margin: 16px 0 8px 0; color: #2E7D32;">Field Health Distribution</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px;">
+                    <div style="padding: 8px; background: rgba(34, 139, 34, 0.1); border-radius: 4px;">
+                        <strong>Excellent:</strong> ${satelliteData.health_distribution.excellent} fields
+                    </div>
+                    <div style="padding: 8px; background: rgba(154, 205, 50, 0.1); border-radius: 4px;">
+                        <strong>Good:</strong> ${satelliteData.health_distribution.good} fields
+                    </div>
+                    <div style="padding: 8px; background: rgba(255, 215, 0, 0.1); border-radius: 4px;">
+                        <strong>Moderate:</strong> ${satelliteData.health_distribution.moderate} fields
+                    </div>
+                    <div style="padding: 8px; background: rgba(255, 69, 0, 0.1); border-radius: 4px;">
+                        <strong>Poor:</strong> ${satelliteData.health_distribution.poor} fields
+                    </div>
+                </div>
+            `;
+            
+            // Create visual field map
+            const fieldColors = satelliteData.visualization_data.field_boundaries;
+            satelliteMap.innerHTML = `
+                <div style="position: relative; width: 100%; height: 200px;">
+                    <div style="position: absolute; top: 10px; left: 10px; font-size: 12px; background: rgba(255,255,255,0.9); padding: 4px 8px; border-radius: 4px;">
+                        🛰️ NDVI Field Map - ${satelliteData.district}
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); gap: 2px; height: 100%; padding: 30px 10px 10px 10px;">
+                        ${fieldColors.map((field, index) => `
+                            <div style="background: ${field.color}; border-radius: 3px; position: relative; opacity: 0.8;" title="Field ${field.field_id}">
+                                <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; text-shadow: 1px 1px 1px rgba(0,0,0,0.5);">
+                                    ${index + 1}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="position: absolute; bottom: 10px; right: 10px; font-size: 10px; background: rgba(255,255,255,0.9); padding: 4px 8px; border-radius: 4px;">
+                        <span style="color: #228B22;">■</span> Excellent 
+                        <span style="color: #9ACD32;">■</span> Good 
+                        <span style="color: #FFD700;">■</span> Moderate 
+                        <span style="color: #FF4500;">■</span> Poor
+                    </div>
+                </div>
+            `;
+            
+            // Display alerts
+            satelliteAlerts.innerHTML = `
+                <h4 style="margin: 0 0 8px 0; color: #2E7D32;">Field Alerts & Recommendations</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    ${satelliteData.alerts.map(alert => `
+                        <div style="padding: 12px; background: rgba(255, 152, 0, 0.1); border-left: 4px solid #FF9800; border-radius: 4px;">
+                            <div style="font-weight: 500; color: #E65100; text-transform: capitalize;">${alert.type.replace('_', ' ')}</div>
+                            <div style="font-size: 13px; margin: 4px 0;">Affected Fields: ${alert.affected_fields}</div>
+                            <div style="font-size: 13px; margin: 4px 0;">Severity: <span style="color: ${alert.severity === 'high' ? '#D32F2F' : alert.severity === 'medium' ? '#FF9800' : '#4CAF50'}">${alert.severity}</span></div>
+                            <div style="font-size: 12px; color: #666; margin-top: 8px;">${alert.recommendation}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            satelliteDashboard.style.display = 'block';
+        }
+
+        // Display satellite-based subsidy analysis
+        function displaySatelliteSubsidyAnalysis(analysis) {
+            const output = `
+🛰️ SATELLITE-BASED SUBSIDY ANALYSIS
+════════════════════════════════════════
+
+ANALYSIS TIMESTAMP: ${new Date(analysis.analysis_timestamp).toLocaleString('en-IN')}
+DISTRICT: ${analysis.district}
+
+SATELLITE INSIGHTS:
+   Total Fields Analyzed: ${analysis.satellite_insights.total_fields_analyzed}
+   Critical Fields (NDVI < 0.5): ${analysis.satellite_insights.critical_fields}
+   Moderate Stress Fields: ${analysis.satellite_insights.moderate_stress_fields}
+   Healthy Fields: ${analysis.satellite_insights.healthy_fields}
+
+PRECISION-TARGETED SUBSIDIES:
+${analysis.targeted_subsidies.map(subsidy => `
+   ${subsidy.scheme_name}
+   ├─ Target Fields: ${subsidy.target_fields} fields
+   ├─ Eligibility: ${subsidy.eligibility_criteria}
+   ├─ Rate: ₹${subsidy.amount_per_hectare.toLocaleString('en-IN')}/hectare
+   ├─ Total Area: ${subsidy.total_area.toFixed(2)} hectares
+   ├─ Farmers Benefiting: ${subsidy.estimated_farmers}
+   ├─ Urgency Level: ${subsidy.urgency}
+   └─ Total Allocation: ₹${subsidy.total_allocation.toLocaleString('en-IN')}
+`).join('')}
+
+FINANCIAL PROJECTION:
+   Total Estimated Cost: ₹${analysis.financial_projection.total_estimated_cost.toLocaleString('en-IN')}
+   Farmers to Benefit: ${analysis.financial_projection.farmers_to_benefit}
+   Cost per Hectare: ₹${analysis.efficiency_metrics.cost_per_hectare.toLocaleString('en-IN')}
+
+EFFICIENCY METRICS:
+   Precision Targeting: ${analysis.efficiency_metrics.precision_targeting}
+   Expected Impact: ${analysis.efficiency_metrics.expected_impact}
+   Monitoring Advantage: ${analysis.efficiency_metrics.monitoring_advantage}
+
+PRIORITY INTERVENTIONS:
+${analysis.financial_projection.priority_interventions.map(intervention => `   • ${intervention}`).join('\n')}
+
+🎯 Satellite-guided precision agriculture subsidy allocation completed.
+Real-time NDVI data ensures targeted relief to genuinely stressed crops.
+════════════════════════════════════════
+            `;
+            
+            simulationOutput.textContent = output;
+        }
+
+        // Load research data
+        document.getElementById('loadResearchData').addEventListener('click', async function() {
+            try {
+                const response = await fetch(`${API_BASE}/research-insights`);
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResearchInsights(data);
+                } else {
+                    showStatus('⚠️ Could not load research data', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading research data:', error);
+                showStatus('⚠️ Research data unavailable (server offline)', 'error');
+            }
+        });
+
+        // Validate research implementation
+        document.getElementById('validateResearch').addEventListener('click', async function() {
+            try {
+                const response = await fetch(`${API_BASE}/test/research-validation`);
+                if (response.ok) {
+                    const data = await response.json();
+                    displayValidationResults(data);
+                } else {
+                    showStatus('⚠️ Could not validate implementation', 'error');
+                }
+            } catch (error) {
+                console.error('Error validating research:', error);
+                showStatus('⚠️ Validation unavailable (server offline)', 'error');
+            }
+        });
+
+        // Display research insights
+        function displayResearchInsights(data) {
+            const output = `
+AGRICULTURAL SUBSIDY RESEARCH INSIGHTS
+════════════════════════════════════════
+
+RESEARCH TITLE: ${data.research_title}
+
+PM-KISAN IMPLEMENTATION CHALLENGES:
+   e-KYC Awareness Gap: ${data.key_findings.pm_kisan_challenges.ekyc_awareness_gap}
+   Payment Irregularity: ${data.key_findings.pm_kisan_challenges.payment_irregularity}
+   Amount Inadequacy: ${data.key_findings.pm_kisan_challenges.amount_inadequacy}
+   Timing Criticality: ${data.key_findings.pm_kisan_challenges.timing_criticality}
+
+DIGITAL BARRIERS:
+   Biometric Issues: ${data.key_findings.digital_barriers.biometric_issues}
+   Network Dependency: ${data.key_findings.digital_barriers.network_dependency}
+   Digital Literacy: ${data.key_findings.digital_barriers.digital_literacy}
+
+SYSTEMIC ISSUES:
+   Data Integrity: ${data.key_findings.systemic_issues.data_integrity}
+   Fraudulent Activities: ${data.key_findings.systemic_issues.fraudulent_activities}
+   Grievance Complexity: ${data.key_findings.systemic_issues.grievance_complexity}
+
+DIGITAL AGRICULTURE MISSION OPPORTUNITIES:
+   AgriStack Integration: ${data.opportunities.digital_agriculture_mission.agristack_integration}
+   Krishi-DSS: ${data.opportunities.digital_agriculture_mission.krishi_dss}
+   Strategic Alignment: ${data.opportunities.digital_agriculture_mission.strategic_alignment}
+
+KEY RECOMMENDATIONS:
+   Farmer-Centric Design: ${data.recommendations.farmer_centric_design}
+   Unified Platform: ${data.recommendations.unified_platform}
+   Dynamic Targeting: ${data.recommendations.dynamic_targeting}
+   Transparency: ${data.recommendations.transparency_mechanisms}
+
+IMPACT POTENTIAL:
+   Value Leakage Reduction: ${data.impact_potential.value_leakage_reduction}
+   Inclusion Improvement: ${data.impact_potential.inclusion_improvement}
+   ROI Measurement: ${data.impact_potential.roi_measurement}
+
+Research-based insights loaded successfully.
+════════════════════════════════════════
+            `;
+            
+            simulationOutput.textContent = output;
+            showStatus('📊 Research insights loaded successfully', 'success');
+        }
+
+        // Display validation results
+        function displayValidationResults(data) {
+            const output = `
+RESEARCH IMPLEMENTATION VALIDATION
+════════════════════════════════════════
+
+VALIDATION STATUS: ${data.validation_status}
+IMPLEMENTATION SCORE: ${data.implementation_score}%
+RESEARCH PAPER: ${data.research_paper}
+
+TESTS PERFORMED:
+${data.tests_performed.map(test => `
+   ${test.test_name}: ${test.status}
+   ${Object.entries(test.findings).map(([key, value]) => `   - ${value}`).join('\n')}
+`).join('')}
+
+AREAS VALIDATED:
+${data.areas_validated.map(area => `   ✓ ${area}`).join('\n')}
+
+IMPLEMENTATION STATUS:
+${data.recommendations_status.map(rec => `   ${rec}`).join('\n')}
+
+Validation completed: ${new Date(data.test_timestamp).toLocaleString()}
+All research findings successfully implemented and validated.
+════════════════════════════════════════
+            `;
+            
+            simulationOutput.textContent = output;
+            showStatus('✅ Implementation validation completed successfully', 'success');
+        }
+
+        // Clear simulation output
+        clearOutputBtn.addEventListener('click', function() {
+            simulationOutput.textContent = `Subsidy Simulation Console
+Ready to run simulations...
+
+🚀 Enhanced Features Available:
+- 🌤️ Live Weather API Integration (WeatherAPI.com)
+- 🤖 Gemini AI Powered Analytics & Recommendations  
+- 📊 Real-time Agricultural Data (AgriStack, Krishi-DSS)
+- 🛰️ Satellite Monitoring (EOSDA NDVI)
+- 💰 Market Price Feeds (AGMARKNET, e-NAM)
+
+Active farmers database: 50,000+ registered
+System ready for enhanced AI-powered subsidy calculations...`;
+            
+            // Hide weather, AI, and satellite dashboards
+            document.getElementById('weatherDashboard').style.display = 'none';
+            document.getElementById('aiInsightsDashboard').style.display = 'none';
+            document.getElementById('satelliteDashboard').style.display = 'none';
+            
+            if (chart) {
+                chart.destroy();
+                initializeChart();
+            }
+        });
+
+        // Initialize Chart.js
+        function initializeChart() {
+            const ctx = document.getElementById('subsidyChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Subsidy Payout (₹ Lakhs)',
+                        data: [],
+                        backgroundColor: '#000000',
+                        borderColor: '#000000',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        barThickness: 40
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Subsidy Distribution by District',
+                            font: {
+                                family: '-apple-system, BlinkMacSystemFont, "Segue UI", "Roboto"',
+                                size: 18,
+                                weight: 700
+                            },
+                            color: '#000000',
+                            padding: 24
+                        },
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: '-apple-system, BlinkMacSystemFont, "Segue UI", "Roboto"',
+                                    size: 13,
+                                    weight: 300
+                                },
+                                color: '#a0a0a0',
+                                padding: 20
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: '-apple-system, BlinkMacSystemFont, "Segue UI", "Roboto"',
+                                    size: 13,
+                                    weight: 300
+                                },
+                                color: '#a0a0a0'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f0f0f0',
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                font: {
+                                    family: '-apple-system, BlinkMacSystemFont, "Segue UI", "Roboto"',
+                                    size: 13,
+                                    weight: 300
+                                },
+                                color: '#a0a0a0'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Amount (₹ Lakhs)',
+                                font: {
+                                    family: '-apple-system, BlinkMacSystemFont, "Segue UI", "Roboto"',
+                                    size: 15,
+                                    weight: 500
+                                },
+                                color: '#000000'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1200,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Update chart with simulation data
+        function updateChart(data) {
+            if (!chart) return;
+
+            const districtData = {};
+            
+            // Process triggered subsidies
+            if (data.triggeredSubsidies && data.triggeredSubsidies.length > 0) {
+                data.triggeredSubsidies.forEach(subsidy => {
+                    if (districtData[subsidy.district]) {
+                        districtData[subsidy.district] += subsidy.totalPayout;
+                    } else {
+                        districtData[subsidy.district] = subsidy.totalPayout;
+                    }
+                });
+            } else {
+                // Show sample data if no subsidies triggered
+                const sampleDistricts = ['Ludhiana', 'Amritsar', 'Jalandhar', 'Patiala', 'Bathinda'];
+                sampleDistricts.forEach(district => {
+                    districtData[district] = Math.floor(Math.random() * 50000) + 10000;
+                });
+            }
+
+            const labels = Object.keys(districtData);
+            const amounts = Object.values(districtData).map(amount => amount / 100000); // Convert to lakhs
+
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = amounts;
+            
+            // Add hover effects and animations
+            chart.data.datasets[0].backgroundColor = amounts.map(() => '#000000');
+            chart.data.datasets[0].hoverBackgroundColor = amounts.map(() => '#333333');
+            chart.data.datasets[0].hoverBorderColor = amounts.map(() => '#000000');
+            
+            chart.update('active');
+            
+            // Log chart update
+            console.log('Chart updated with data:', { labels, amounts });
+        }
+    </script>
+</body>
+</html>

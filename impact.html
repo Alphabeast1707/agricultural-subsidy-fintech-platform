@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impact Analytics - AgriSubsidy Portal</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: #ffffff;
+            color: #a0a0a0;
+            font-weight: 300;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #000000;
+            color: #b5b5b5;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            border-right: 1px solid #f0f0f0;
+        }
+
+        .logo {
+            padding: 24px 32px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .logo h2 {
+            font-size: 17px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        .logo i {
+            color: #d0d0d0;
+            font-size: 20px;
+        }
+
+        .nav-menu {
+            padding: 24px 0;
+        }
+
+        .nav-item {
+            margin: 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            background: #ffffff;
+        }
+
+        .nav-item.active a {
+            color: #000000;
+        }
+
+        .nav-item:hover {
+            background: #f5f5f5;
+        }
+
+        .nav-item:hover a {
+            color: #000000;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 12px 32px;
+            color: #b5b5b5;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 300;
+            gap: 12px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item i {
+            width: 18px;
+            font-size: 16px;
+            color: #d0d0d0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 80px 32px;
+            max-width: 1200px;
+        }
+
+        .header {
+            margin-bottom: 80px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 24px;
+            letter-spacing: -0.8px;
+            line-height: 1.15;
+        }
+
+        .header p {
+            color: #a0a0a0;
+            font-size: 17px;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        /* Key Metrics */
+        .metrics-section {
+            margin-bottom: 96px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 48px;
+            color: #000000;
+            letter-spacing: -0.8px;
+            line-height: 1.15;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+
+        .metric-card {
+            background: #f5f5f5;
+            padding: 32px;
+            border-radius: 32px;
+            border: 1px solid #f0f0f0;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .metric-card:hover {
+            background: #e8e8e8;
+        }
+
+        .metric-icon {
+            width: 48px;
+            height: 48px;
+            background: #000000;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            color: #ffffff;
+            font-size: 20px;
+        }
+
+        .metric-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 8px;
+            letter-spacing: -0.8px;
+        }
+
+        .metric-label {
+            font-size: 15px;
+            color: #a0a0a0;
+            font-weight: 300;
+            margin-bottom: 4px;
+        }
+
+        .metric-change {
+            font-size: 13px;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 6px;
+            background: #000000;
+            color: #ffffff;
+        }
+
+        .metric-change.positive {
+            background: #000000;
+            color: #ffffff;
+        }
+
+        .metric-change.negative {
+            background: #e8e8e8;
+            color: #a0a0a0;
+        }
+
+        /* Charts Section */
+        .charts-section {
+            margin-bottom: 96px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+        }
+
+        .chart-container {
+            background: #f5f5f5;
+            padding: 32px;
+            border-radius: 32px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 24px;
+            letter-spacing: -0.3px;
+        }
+
+        .chart-subtitle {
+            font-size: 13px;
+            color: #a0a0a0;
+            font-weight: 300;
+            margin-bottom: 32px;
+            line-height: 1.4;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 300px;
+        }
+
+        /* Performance Analysis */
+        .performance-section {
+            margin-bottom: 96px;
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+
+        .radar-container {
+            background: #f5f5f5;
+            padding: 48px;
+            border-radius: 32px;
+            border: 1px solid #f0f0f0;
+            text-align: center;
+        }
+
+        .radar-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        .radar-subtitle {
+            font-size: 15px;
+            color: #a0a0a0;
+            font-weight: 300;
+            margin-bottom: 40px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                padding: 48px 32px;
+            }
+
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+                gap: 48px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 32px 16px;
+            }
+
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container,
+            .radar-container {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h2><i class="fas fa-seedling"></i> AgriSubsidy</h2>
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <a href="Subsidy_Engine.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="Subsidy_Engine.html">
+                        <i class="fas fa-cog"></i>
+                        Design Subsidy
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="Subsidy_Engine.html">
+                        <i class="fas fa-users"></i>
+                        Farmers & Land
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="Access.html">
+                        <i class="fas fa-file-alt"></i>
+                        Aadhaar Data
+                    </a>
+                </div>
+                <div class="nav-item active">
+                    <a href="impact.html">
+                        <i class="fas fa-chart-line"></i>
+                        Impact Analytics
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="Subsidy_Engine.html">
+                        <i class="fas fa-cloud-sun"></i>
+                        Weather Data
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="Fund_Flow.html">
+                        <i class="fas fa-exchange-alt"></i>
+                        Fund Flow
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="fraud_detection.html">
+                        <i class="fas fa-shield-alt"></i>
+                        Fraud Alerts
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1>Impact Analytics</h1>
+                <p>KPIs metrics and agricultural subsidy impact assessment</p>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="metrics-section">
+                <h2 class="section-title">Key Performance Indicators</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card" onclick="showMetricDetails('farmers')">
+                        <div class="metric-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="metric-value" id="farmersCount">14,250</div>
+                        <div class="metric-label">Total Farmers</div>
+                        <div class="metric-change positive">+4.1%</div>
+                    </div>
+
+                    <div class="metric-card" onclick="showMetricDetails('yield')">
+                        <div class="metric-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="metric-value" id="yieldImprovement">18.4%</div>
+                        <div class="metric-label">Yield Improvement</div>
+                        <div class="metric-change positive">+2.3%</div>
+                    </div>
+
+                    <div class="metric-card" onclick="showMetricDetails('income')">
+                        <div class="metric-icon">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                        <div class="metric-value" id="incomeIncrease">24.7%</div>
+                        <div class="metric-label">Income Increase</div>
+                        <div class="metric-change positive">+1.8%</div>
+                    </div>
+
+                    <div class="metric-card" onclick="showMetricDetails('efficiency')">
+                        <div class="metric-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="metric-value" id="efficiency">22.1%</div>
+                        <div class="metric-label">Subsidy Efficiency</div>
+                        <div class="metric-change negative">-0.5%</div>
+                    </div>
+
+                    <div class="metric-card" onclick="showMetricDetails('adoption')">
+                        <div class="metric-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="metric-value" id="techAdoption">89.3%</div>
+                        <div class="metric-label">Tech Adoption</div>
+                        <div class="metric-change positive">+5.2%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <h2 class="section-title">Agricultural Budget vs Revenue Analysis</h2>
+                <p class="chart-subtitle">Comparison of allocated budget against disbursed amounts and expected agricultural revenue</p>
+                
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Monthly Disbursement vs Budget</h3>
+                        <canvas id="budgetChart" class="chart-canvas"></canvas>
+                    </div>
+
+                    <div class="chart-container">
+                        <h3 class="chart-title">Revenue Impact by Quarter</h3>
+                        <canvas id="revenueChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Analysis -->
+            <div class="performance-section">
+                <h2 class="section-title">Scheme Performance Comparison</h2>
+                <div class="performance-grid">
+                    <div class="radar-container">
+                        <h3 class="radar-title">Multi-dimensional Performance Analysis</h3>
+                        <p class="radar-subtitle">Comparative performance across key metrics for different subsidy schemes</p>
+                        <canvas id="radarChart" class="chart-canvas" style="height: 400px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for metrics animation
+        const metricsData = {
+            farmers: { current: 14250, target: 15000, growth: 4.1 },
+            yield: { current: 18.4, target: 25.0, growth: 2.3 },
+            income: { current: 24.7, target: 30.0, growth: 1.8 },
+            efficiency: { current: 22.1, target: 35.0, growth: -0.5 },
+            adoption: { current: 89.3, target: 95.0, growth: 5.2 }
+        };
+
+        // Budget vs Revenue Chart
+        function createBudgetChart() {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+                    datasets: [
+                        {
+                            label: 'Budget Allocated',
+                            data: [65000, 59000, 80000, 81000, 56000, 75000, 88000, 76000, 92000],
+                            backgroundColor: '#000000',
+                            borderRadius: 4,
+                            barThickness: 20
+                        },
+                        {
+                            label: 'Funds Disbursed (%)',
+                            data: [58000, 62000, 75000, 79000, 61000, 72000, 85000, 78000, 89000],
+                            backgroundColor: '#a0a0a0',
+                            borderRadius: 4,
+                            barThickness: 20
+                        },
+                        {
+                            label: 'Expected Revenue',
+                            data: [72000, 68000, 85000, 87000, 64000, 80000, 95000, 82000, 98000],
+                            backgroundColor: '#d0d0d0',
+                            borderRadius: 4,
+                            barThickness: 20
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto"',
+                                    size: 13,
+                                    weight: 300
+                                },
+                                color: '#a0a0a0',
+                                padding: 20
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto"',
+                                    size: 13,
+                                    weight: 300
+                                },
+                                color: '#a0a0a0'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: '#f0f0f0',
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                font: {
+                                    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto"',
+                                    size: 13,
+                                    weight: 300
+                                },
+                                color: '#a0a0a0'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Revenue Impact Chart
+        function createRevenueChart() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Q1 2023', 'Q2 2023', 'Q3 2023', 'Q4 2023', 'Q1 2024', 'Q2 2024', 'Q3 2024'],
+                    datasets: [
+                        {
+                            label: 'Agricultural Revenue',
+                            data: [75000, 82000, 89000, 95000, 98000, 105000, 112000],
+                            borderColor: '#000000',
+                            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#000000',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6
+                        },
+                        {
+                            label: 'Subsidy Investment',
+                            data: [45000, 48000, 52000, 55000, 58000, 62000, 65000],
+                            borderColor: '#a0a0a0',
+                            backgroundColor: 'rgba(160, 160, 160, 0.1)',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.4,
+                            pointBackgroundColor: '#a0a0a0',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto"',
+                                    size: 13,
+                                    weight: 300
+                                },
+                                color: '#a0a0a0',
+                                padding: 20
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto"',
+                                    size: 13,
+                                    weight: 300
+                                },
+                                color: '#a0a0a0'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: '#f0f0f0',
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                font: {
+                                    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto"',
+                                    size: 13,
+                                    weight: 300
+                                },
+                                color: '#a0a0a0'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Radar Chart for Scheme Comparison
+        function createRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Yield Improvement', 'Water Efficiency', 'Income Growth', 'Technology Adoption', 'Sustainability'],
+                    datasets: [
+                        {
+                            label: 'PM-KISAN',
+                            data: [85, 70, 90, 65, 80],
+                            borderColor: '#000000',
+                            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#000000',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        },
+                        {
+                            label: 'Drip Irrigation',
+                            data: [70, 95, 75, 85, 90],
+                            borderColor: '#a0a0a0',
+                            backgroundColor: 'rgba(160, 160, 160, 0.1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#a0a0a0',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        },
+                        {
+                            label: 'Organic Farming',
+                            data: [80, 85, 70, 60, 95],
+                            borderColor: '#d0d0d0',
+                            backgroundColor: 'rgba(208, 208, 208, 0.1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#d0d0d0',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto"',
+                                    size: 13,
+                                    weight: 300
+                                },
+                                color: '#a0a0a0',
+                                padding: 20
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: '#f0f0f0'
+                            },
+                            angleLines: {
+                                color: '#f0f0f0'
+                            },
+                            pointLabels: {
+                                font: {
+                                    family: '-apple-system, BlinkMacSystemFont, "Segue UI", "Roboto"',
+                                    size: 13,
+                                    weight: 300
+                                },
+                                color: '#a0a0a0'
+                            },
+                            ticks: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Animate metric counters
+        function animateMetrics() {
+            Object.keys(metricsData).forEach(key => {
+                const element = document.getElementById(key === 'farmers' ? 'farmersCount' : 
+                                                    key === 'yield' ? 'yieldImprovement' :
+                                                    key === 'income' ? 'incomeIncrease' :
+                                                    key === 'efficiency' ? 'efficiency' : 'techAdoption');
+                
+                if (element) {
+                    const finalValue = metricsData[key].current;
+                    let currentValue = 0;
+                    const increment = finalValue / 60;
+                    const isPercentage = key !== 'farmers';
+                    
+                    const counter = setInterval(() => {
+                        currentValue += increment;
+                        if (currentValue >= finalValue) {
+                            currentValue = finalValue;
+                            clearInterval(counter);
+                        }
+                        
+                        if (key === 'farmers') {
+                            element.textContent = Math.floor(currentValue).toLocaleString();
+                        } else {
+                            element.textContent = currentValue.toFixed(1) + '%';
+                        }
+                    }, 25);
+                }
+            });
+        }
+
+        // Show metric details
+        function showMetricDetails(metric) {
+            const data = metricsData[metric];
+            const metricNames = {
+                farmers: 'Total Farmers',
+                yield: 'Yield Improvement',
+                income: 'Income Increase',
+                efficiency: 'Subsidy Efficiency',
+                adoption: 'Technology Adoption'
+            };
+            
+            alert(`${metricNames[metric]} Details:\n\nCurrent: ${data.current}${metric === 'farmers' ? '' : '%'}\nTarget: ${data.target}${metric === 'farmers' ? '' : '%'}\nGrowth Rate: ${data.growth > 0 ? '+' : ''}${data.growth}%\n\nClick OK to view detailed breakdown.`);
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create charts
+            createBudgetChart();
+            createRevenueChart();
+            createRadarChart();
+            
+            // Animate metrics after a short delay
+            setTimeout(animateMetrics, 800);
+            
+            // Update metrics every 30 seconds with small variations
+            setInterval(() => {
+                Object.keys(metricsData).forEach(key => {
+                    const variation = (Math.random() - 0.5) * 2; // ±1 variation
+                    metricsData[key].current += variation;
+                    metricsData[key].growth += (Math.random() - 0.5) * 0.2;
+                });
+                animateMetrics();
+            }, 30000);
+        });
+
+        // Add some interactivity to charts
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('Impact Analytics Dashboard loaded successfully');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

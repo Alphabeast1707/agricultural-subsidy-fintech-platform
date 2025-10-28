@@ -10,13 +10,30 @@ import google.generativeai as genai
 
 app = FastAPI(title="Subsidy Design Engine API", version="1.0.0")
 
-# API Keys
-WEATHER_API_KEY = "d093940d8d674e05a15103206251410"
-GEMINI_API_KEY = "AIzaSyCChBUF0HQt8l4atjVsrrF_gR8ap_1VzZg"
+# Load environment variables for secure API key management
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# API Keys - loaded from environment variables for security
+WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+
+# Validate API keys are loaded
+if not WEATHER_API_KEY:
+    print("⚠️  Warning: WEATHER_API_KEY not found in environment variables")
+if not GEMINI_API_KEY:
+    print("⚠️  Warning: GEMINI_API_KEY not found in environment variables")
 
 # Configure Gemini AI
-genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-pro')
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel('gemini-pro')
+else:
+    print("❌ Cannot configure Gemini AI: API key missing")
+    model = None
 
 # Enable CORS for frontend
 app.add_middleware(
@@ -958,6 +975,9 @@ async def detect_fraud():
 @app.get("/weather/{location}")
 async def get_live_weather(location: str):
     """Get live weather data from WeatherAPI.com"""
+    if not WEATHER_API_KEY:
+        raise HTTPException(status_code=500, detail="Weather API key not configured")
+    
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
@@ -1024,8 +1044,11 @@ async def generate_ai_insights(simulation_data: dict):
         """
         
         # Generate insights using Gemini
-        response = model.generate_content(context)
-        ai_text = response.text
+        if model:
+            response = model.generate_content(context)
+            ai_text = response.text
+        else:
+            ai_text = "AI service unavailable - using fallback analysis based on simulation data."
         
         # Parse and structure the AI response into categories
         insights = []
@@ -1236,8 +1259,11 @@ async def generate_location_specific_ai_insights(location_context: dict):
         """
         
         # Generate insights using Gemini AI
-        response = model.generate_content(context)
-        ai_text = response.text
+        if model:
+            response = model.generate_content(context)
+            ai_text = response.text
+        else:
+            ai_text = f"AI service unavailable - providing location-based analysis for {location} using available data."
         
         # Create location-specific insights
         insights = []
